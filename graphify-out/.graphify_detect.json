@@ -1,0 +1,58 @@
+{
+  "files": {
+    "code": [
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/src/types.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/src/database-client.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/src/camera-service.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/src/server.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/movement-detector.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/video-processor.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/types.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/database-client.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/kafka-consumer.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/license-plate-detector.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/onnx-client.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/alarm-decider.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/src/worker.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/notification-service/src/types.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/notification-service/src/server.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/primary-api/src/kafka-producer.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/primary-api/src/types.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/primary-api/src/minio-client.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/primary-api/src/server.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/tests/milestone-bridge.test.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/video-stream.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/video-fetcher.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/types.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/database-client.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/graphql-client.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/milestone-bridge.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/src/server.ts",
+      "/Users/nandanthakur/projects/video-ai-system-V3/infrastructure/metrics.ts"
+    ],
+    "document": [
+      "/Users/nandanthakur/projects/video-ai-system-V3/readme.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/AGENTS.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/config/config.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/src/public/index.html",
+      "/Users/nandanthakur/projects/video-ai-system-V3/web-app/src/public/login.html",
+      "/Users/nandanthakur/projects/video-ai-system-V3/temporal/config/config.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/notification-service/config/config.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/docs/deployment-guide.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/docs/gdpr-compliance.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/primary-api/config/config.md",
+      "/Users/nandanthakur/projects/video-ai-system-V3/vms-bridge/config/milestone.md"
+    ],
+    "paper": [],
+    "image": [],
+    "video": []
+  },
+  "total_files": 39,
+  "total_words": 12590,
+  "needs_graph": false,
+  "warning": "Corpus is ~12,590 words - fits in a single context window. You may not need a graph.",
+  "skipped_sensitive": [
+    "/Users/nandanthakur/projects/video-ai-system-V3/kubernetes/base/secrets.yml"
+  ],
+  "graphifyignore_patterns": 0
+}

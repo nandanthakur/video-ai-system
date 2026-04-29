@@ -1,0 +1,118 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'video-ai-system'
+    environment: 'production'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+rule_files:
+  - 'rules/*.yml'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Application Services
+  - job_name: 'primary-api'
+    static_configs:
+      - targets: ['primary-api:8000']
+    metrics_path: '/metrics'
+
+  - job_name: 'vms-bridge'
+    static_configs:
+      - targets: ['vms-bridge:8001']
+    metrics_path: '/metrics'
+
+  - job_name: 'temporal-worker'
+    static_configs:
+      - targets: ['temporal:7233']
+    metrics_path: '/metrics'
+
+  - job_name: 'web-app'
+    static_configs:
+      - targets: ['web-app:8005']
+    metrics_path: '/metrics'
+
+  # Infrastructure
+  - job_name: 'minio'
+    static_configs:
+      - targets: ['minio:9000']
+    metrics_path: '/minio/v2/metrics/cluster'
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+
+  # Node & GPU
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'gpu'
+    static_configs:
+      - targets: ['nvidia-dcgm-exporter:9400']
+
+  # Kubernetes cluster metrics
+  - job_name: 'kube-state-metrics'
+    static_configs:
+      - targets: ['kube-state-metrics:8080']
+    metrics_path: '/metrics'
+
+  - job_name: 'kubelet'
+    static_configs:
+      - targets: ['kubelet:10250']
+    metrics_path: '/metrics/cadvisor'
+
+  - job_name: 'kube-scheduler'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - kube-system
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kube-system;kube-scheduler;https
+
+  - job_name: 'kube-controller-manager'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - kube-system
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kube-system;kube-controller-manager;https
+
+  - job_name: 'kube-apiserver'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - kube-system
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kube-system;kubernetes;https
+
+  - job_name: 'kube-etcd'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - kube-system
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kube-system;etcd;https

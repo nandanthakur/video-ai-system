@@ -1,0 +1,51 @@
+# Retry and fault tolerance configuration
+
+# Kafka producer retries
+kafka:
+  producer:
+    retries: 3
+    retryBackoffMs: 1000
+    enableIdempotence: true
+    acks: all
+    
+  consumer:
+    sessionTimeoutMs: 30000
+    heartbeatIntervalMs: 3000
+    maxPollIntervalMs: 300000
+    maxPollRecords: 500
+    enableAutoCommit: true
+    autoCommitIntervalMs: 5000
+    
+# Workflow retry policy
+workflow:
+  maxAttempts: 3
+  initialIntervalSeconds: 2
+  maxIntervalSeconds: 60
+  backoffMultiplier: 2
+  deadlineMinutes: 30
+
+# Circuit breaker
+circuitBreaker:
+  failureThreshold: 5
+  successThreshold: 2
+  timeoutSeconds: 60
+  halfOpenRequests: 3
+
+# Health check intervals
+healthcheck:
+  livenessInitialDelaySeconds: 30
+  livenessPeriodSeconds: 10
+  livenessFailureThreshold: 3
+  readinessInitialDelaySeconds: 5
+  readinessPeriodSeconds: 5
+  readinessFailureThreshold: 3
+
+# Graceful shutdown
+gracefulShutdown:
+  terminationGracePeriodSeconds: 30
+  preStopSleepSeconds: 10
+
+# Startup deadline
+startup:
+  failureThreshold: 30
+  periodSeconds: 10

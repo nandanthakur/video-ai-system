@@ -1,0 +1,213 @@
+# Video AI System Configuration
+# Single source of truth for all services
+
+version: "1.0"
+
+# =============================================================================
+# Environment
+# =============================================================================
+environment:
+  name: production
+  logLevel: info
+
+# =============================================================================
+# VMS Configuration
+# =============================================================================
+vms:
+  type: milestone
+  milestone:
+    host: "192.168.1.100"
+    port: 443
+    username: "admin"
+    password: "${MILESTONE_PASSWORD}"
+  aiBridge:
+    host: "localhost"
+    port: 4000
+    graphqlEndpoint: "http://localhost:4000/api/bridge/graphql"
+    videoProxyPort: 8787
+    healthPort: 3500
+
+# =============================================================================
+# Video Processing Configuration
+# =============================================================================
+processing:
+  pollIntervalSeconds: 10
+  defaultPreAlarmSeconds: 5
+  defaultPostAlarmSeconds: 5
+  alarmTriggerTypes:
+    - motion_detection
+    - analytics_event
+
+# =============================================================================
+# AI Model Configuration
+# =============================================================================
+ai:
+  models:
+    normal:
+      path: "/models/yolov7-normal.onnx"
+      labels:
+        - person
+        - vehicle
+        - license_plate
+      confidenceThreshold: 0.5
+      inputSize: 640
+    thermal:
+      path: "/models/yolov7-thermal.onnx"
+      labels:
+        - person
+      confidenceThreshold: 0.5
+      inputSize: 640
+  movement:
+    minFramesForMovement: 3
+    movementThreshold: 5.0
+  licensePlate:
+    ocrEndpoint: "http://license-plate:8004/ocr"
+
+# =============================================================================
+# Camera Types and Detection Rules
+# =============================================================================
+cameras:
+  types:
+    normal:
+      detections:
+        - person
+        - vehicle
+        - license_plate
+    thermal:
+      detections:
+        - person
+  alarmRules:
+    - name: person_detected
+      condition: "class == 'person'"
+      action: alarm_open
+    - name: vehicle_moving
+      condition: "class == 'vehicle' AND moving == true"
+      action: alarm_open
+    - name: vehicle_stationary
+      condition: "class == 'vehicle' AND moving == false"
+      action: alarm_close
+
+# =============================================================================
+# Infrastructure Configuration
+# =============================================================================
+infrastructure:
+  postgres:
+    host: "postgres"
+    port: 5432
+    database: "video_ai"
+    user: "postgres"
+    password: "${POSTGRES_PASSWORD}"
+    poolSize: 10
+
+  minio:
+    host: "minio"
+    port: 9000
+    consolePort: 9001
+    bucket: "video-ai"
+    accessKey: "${MINIO_ACCESS_KEY}"
+    secretKey: "${MINIO_SECRET_KEY}"
+    useSSL: false
+
+  kafka:
+    brokers:
+      - "kafka:9092"
+    topicPrefix: "video-ai"
+    consumerGroup: "temporal-worker"
+    partitions: 3
+    replicationFactor: 1
+
+  temporal:
+    host: "temporal"
+    port: 7233
+
+  monitoring:
+    prometheus:
+      port: 9090
+    grafana:
+      port: 3000
+    loki:
+      port: 3100
+    alertmanager:
+      port: 9093
+
+# =============================================================================
+# Service Configuration
+# =============================================================================
+services:
+  primaryApi:
+    port: 8000
+    host: "0.0.0.0"
+
+  vmsBridge:
+    port: 8001
+    host: "0.0.0.0"
+    syncCamerasOnStartup: true
+
+  webApp:
+    port: 8005
+    host: "0.0.0.0"
+    sessionSecret: "${SESSION_SECRET}"
+
+  licensePlate:
+    port: 8004
+    host: "0.0.0.0"
+
+# =============================================================================
+# Resource Limits
+# =============================================================================
+resources:
+  primaryApi:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  vmsBridge:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+  temporalWorker:
+    requests:
+      cpu: "2"
+      memory: "1Gi"
+      nvidia.com/gpu: 1
+    limits:
+      cpu: "4"
+      memory: "2Gi"
+      nvidia.com/gpu: 1
+
+  webApp:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+# =============================================================================
+# Security
+# =============================================================================
+security:
+  jwt:
+    secret: "${JWT_SECRET}"
+    expiration: 3600
+  credentials:
+    defaultAdmin: admin
+    defaultPassword: admin123
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: info
+  format: json
+  outputs:
+    - type: stdout
+    - type: loki
+      url: "http://loki:3100/loki/api/v1/push"
