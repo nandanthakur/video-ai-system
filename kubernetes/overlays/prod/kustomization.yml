@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: video-ai
+
+resources:
+  - ../../base
+  - primary-api-hpa.yml
+  - temporal-worker-hpa.yml
+
+patches:
+  # Primary API - prod: 2-10 replicas with HPA
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+    target:
+      kind: Deployment
+      name: primary-api
+
+  # Temporal Worker - prod: 1-5 replicas with HPA (GPU)
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: temporal-worker
+
+  # Web App - prod: 2 replicas
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+    target:
+      kind: Deployment
+      name: web-app
+
+configMapGenerator:
+  - name: video-ai-config
+    literals:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info

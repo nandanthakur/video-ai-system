@@ -1,0 +1,689 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "icon": "ti ti-database",
+        "name": "Infrastructure",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "id": 100,
+      "panels": [],
+      "title": "MinIO Storage",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 70}, {"color": "red", "value": 90}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 1},
+      "id": 1,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "minio_cluster_capacity_usage_percent", "refId": "A"}],
+      "title": "Cluster Capacity %",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 1},
+      "id": 2,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "minio_cluster_nodes_online", "refId": "A"}],
+      "title": "Nodes Online",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 1}, {"color": "red", "value": 5}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 1},
+      "id": 3,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "minio_cluster_disks_offline", "refId": "A"}],
+      "title": "Disks Offline",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "line"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 70}, {"color": "red", "value": 90}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 5},
+      "id": 10,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "minio_cluster_capacity_usage_percent", "legendFormat": "Usage %", "refId": "A"}
+      ],
+      "title": "Cluster Capacity Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 5},
+      "id": 11,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(minio_s3_requests_total[5m])", "legendFormat": "{{method}}", "refId": "A"}
+      ],
+      "title": "S3 Request Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 13},
+      "id": 12,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "histogram_quantile(0.95, sum(rate(minio_s3_requests_latency_seconds_bucket[5m])) by (le))", "legendFormat": "P95", "refId": "A"},
+        {"expr": "histogram_quantile(0.99, sum(rate(minio_s3_requests_latency_seconds_bucket[5m])) by (le))", "legendFormat": "P99", "refId": "B"}
+      ],
+      "title": "S3 Request Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 13},
+      "id": 13,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(minio_s3_bytes_received_total[5m]) / 1024 / 1024", "legendFormat": "Received", "refId": "A"},
+        {"expr": "rate(minio_s3_bytes_sent_total[5m]) / 1024 / 1024", "legendFormat": "Sent", "refId": "B"}
+      ],
+      "title": "S3 Data Transfer (MB/s)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 21},
+      "id": 101,
+      "panels": [],
+      "title": "PostgreSQL",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [{"options": {"0": {"color": "red", "index": 0, "text": "Down"}, "1": {"color": "green", "index": 1, "text": "Up"}}, "type": "value"}],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 3, "x": 0, "y": 22},
+      "id": 20,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "pg_up", "refId": "A"}],
+      "title": "PostgreSQL Status",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 3, "x": 3, "y": 22},
+      "id": 21,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "pg_stat_database_numbackends", "refId": "A"}],
+      "title": "Active Connections",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 80}, {"color": "red", "value": 100}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 3, "x": 6, "y": 22},
+      "id": 22,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "pg_stat_database_max_tx_duration", "refId": "A"}],
+      "title": "Max Transaction (s)",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 26},
+      "id": 23,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "pg_stat_activity_count", "legendFormat": "Active", "refId": "A"},
+        {"expr": "pg_stat_activity_idle", "legendFormat": "Idle", "refId": "B"}
+      ],
+      "title": "Database Connections",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 26},
+      "id": 24,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(pg_stat_database_xact_commit[5m])", "legendFormat": "Commits", "refId": "A"},
+        {"expr": "rate(pg_stat_database_xact_rollback[5m])", "legendFormat": "Rollbacks", "refId": "B"}
+      ],
+      "title": "Transactions",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 34},
+      "id": 25,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(pg_stat_database_blks_hit[5m])", "legendFormat": "Hits", "refId": "A"},
+        {"expr": "rate(pg_stat_database_blks_read[5m])", "legendFormat": "Reads", "refId": "B"}
+      ],
+      "title": "Buffer Stats",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 34},
+      "id": 26,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(pg_stat_database_tuples_inserted[5m])", "legendFormat": "Inserted", "refId": "A"},
+        {"expr": "rate(pg_stat_database_tuples_updated[5m])", "legendFormat": "Updated", "refId": "B"},
+        {"expr": "rate(pg_stat_database_tuples_deleted[5m])", "legendFormat": "Deleted", "refId": "C"}
+      ],
+      "title": "Tuple Operations",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 42},
+      "id": 102,
+      "panels": [],
+      "title": "Kafka",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [{"options": {"0": {"color": "red", "index": 0, "text": "Down"}, "1": {"color": "green", "index": 1, "text": "Up"}}, "type": "value"}],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 3, "x": 0, "y": 43},
+      "id": 30,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "up{job=\"kafka\"}", "refId": "A"}],
+      "title": "Kafka Status",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 50}, {"color": "red", "value": 100}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 3, "x": 3, "y": 43},
+      "id": 31,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "kafka_consumer_group_lag", "refId": "A"}],
+      "title": "Consumer Lag",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 3, "x": 6, "y": 43},
+      "id": 32,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "kafka_topics_count", "refId": "A"}],
+      "title": "Topics",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 50}, {"color": "red", "value": 100}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 47},
+      "id": 33,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "kafka_consumer_group_lag", "legendFormat": "{{consumer_group}}", "refId": "A"}
+      ],
+      "title": "Consumer Group Lag",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 47},
+      "id": 34,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(kafka_server_broker_messages_in_total[5m])", "legendFormat": "Messages In", "refId": "A"},
+        {"expr": "rate(kafka_server_broker_requests_total[5m])", "legendFormat": "Requests", "refId": "B"}
+      ],
+      "title": "Kafka Messages",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 55},
+      "id": 35,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "kafka_topic_partition_current_offset", "legendFormat": "{{topic}}", "refId": "A"}
+      ],
+      "title": "Topic Offsets",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisBorderWidth": 0,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 55},
+      "id": 36,
+      "options": {"legend": {"calcs": ["mean", "lastNotNull", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "rate(kafka_network_endpoint_connections_total[5m])", "legendFormat": "Connections", "refId": "A"},
+        {"expr": "rate(kafka_network_handler_connections_total[5m])", "legendFormat": "Handler", "refId": "B"}
+      ],
+      "title": "Network Connections",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["video-ai", "infrastructure", "minio", "kafka", "postgres"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Video AI System - Infrastructure",
+  "uid": "video-ai-infrastructure",
+  "version": 1,
+  "weekStart": ""
+}

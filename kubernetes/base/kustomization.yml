@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: video-ai
+
+resources:
+  - namespace.yml
+  - secrets.yml
+  - postgres.yml
+  - primary-api.yml
+  - primary-api-hpa.yml
+  - vms-bridge.yml
+  - temporal.yml
+  - temporal-worker-hpa.yml
+  - web-app.yml
+  - pdb.yml
+
+commonLabels:
+  app.kubernetes.io/name: video-ai-system
+  app.kubernetes.io/part-of: video-ai

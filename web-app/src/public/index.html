@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI System - Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; min-height: 100vh; color: #f8fafc; }
+    .header { background: #1e293b; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+    .header h1 { font-size: 1.25rem; }
+    .btn { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-secondary { background: #475569; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn:hover { opacity: 0.9; }
+    .container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    .toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .camera-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+    .camera-card { background: #1e293b; border-radius: 8px; padding: 1.5rem; border: 1px solid #334155; }
+    .camera-card h3 { margin-bottom: 0.5rem; color: #f8fafc; }
+    .camera-card .type { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem; }
+    .camera-card .detections { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+    .badge { padding: 0.25rem 0.5rem; background: #334155; border-radius: 4px; font-size: 0.75rem; }
+    .badge.active { background: #22c55e; color: white; }
+    .badge.disabled { background: #64748b; color: #cbd5e1; }
+    .camera-card.disabled { opacity: 0.6; }
+    .camera-card .status { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .camera-card .status-toggle { position: relative; width: 44px; height: 24px; }
+    .camera-card .status-toggle input { opacity: 0; width: 0; height: 0; }
+    .camera-card .status-slider { position: absolute; cursor: pointer; inset: 0; background: #475569; border-radius: 24px; transition: 0.3s; }
+    .camera-card .status-slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+    .camera-card .status-toggle input:checked + .status-slider { background: #22c55e; }
+    .camera-card .status-toggle input:checked + .status-slider:before { transform: translateX(20px); }
+    .camera-card .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: #1e293b; padding: 2rem; border-radius: 8px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-content h2 { margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; color: #94a3b8; margin-bottom: 0.5rem; font-size: 0.875rem; }
+    .form-group select, .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #334155; border-radius: 4px; background: #0f172a; color: #f8fafc; font-size: 1rem; }
+    .checkbox-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .checkbox-item { display: flex; align-items: center; gap: 0.5rem; }
+    .checkbox-item input { width: auto; }
+    .checkbox-item label { margin: 0; }
+    .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+    .loading { text-align: center; padding: 2rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Video AI System</h1>
+    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+  </div>
+  <div class="container">
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="syncCameras()">Sync from VMS Bridge</button>
+      <button class="btn btn-primary" onclick="openAddModal()">Add Camera</button>
+    </div>
+    <div class="camera-grid" id="cameraGrid">
+      <div class="loading">Loading cameras...</div>
+    </div>
+  </div>
+  <div class="modal" id="cameraModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Add Camera</h2>
+      <form id="cameraForm">
+        <input type="hidden" id="cameraId">
+        <div class="form-group">
+          <label>Camera Name</label>
+          <input type="text" id="cameraName" required>
+        </div>
+        <div class="form-group">
+          <label>Camera Type</label>
+          <select id="cameraType">
+            <option value="normal">Normal</option>
+            <option value="thermal">Thermal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Detections</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="detectPerson" value="person">
+              <label for="detectPerson">Person</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="detectVehicle" value="vehicle">
+              <label for="detectVehicle">Vehicle</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="detectLicensePlate" value="license_plate">
+              <label for="detectLicensePlate">License Plate</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Pre-Alarm Seconds</label>
+          <input type="number" id="preAlarm" value="5" min="0" max="60">
+        </div>
+        <div class="form-group">
+          <label>Post-Alarm Seconds</label>
+          <input type="number" id="postAlarm" value="5" min="0" max="60">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    let cameras = [];
+    async function loadCameras() {
+      const res = await fetch('/api/cameras');
+      const data = await res.json();
+      cameras = data.cameras || [];
+      renderCameras();
+    }
+    function renderCameras() {
+      const grid = document.getElementById('cameraGrid');
+      if (cameras.length === 0) {
+        grid.innerHTML = '<div class="loading">No cameras. Click "Sync from VMS Bridge" to import cameras.</div>';
+        return;
+      }
+      grid.innerHTML = cameras.map(c => `
+        <div class="camera-card ${c.enabled ? '' : 'disabled'}">
+          <div class="status">
+            <span style="font-size: 0.875rem; color: ${c.enabled ? '#22c55e' : '#ef4444'}">● ${c.enabled ? 'Enabled' : 'Disabled'}</span>
+            <label class="status-toggle">
+              <input type="checkbox" ${c.enabled ? 'checked' : ''} onchange="toggleCamera('${c.id}', this.checked)">
+              <span class="status-slider"></span>
+            </label>
+          </div>
+          <h3>${c.name}</h3>
+          <p class="type">Type: ${c.cameraType}</p>
+          <div class="detections">
+            ${c.detectionConfigs.map(d => `<span class="badge ${d.enabled ? 'active' : 'disabled'}">${d.detectionType}</span>`).join('')}
+          </div>
+          <p style="font-size: 0.875rem; color: #94a3b8;">
+            Video: ${c.videoConfig.preAlarmSeconds}s before / ${c.videoConfig.postAlarmSeconds}s after
+          </p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="editCamera('${c.id}')">Edit</button>
+            <button class="btn btn-danger" onclick="deleteCamera('${c.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    async function syncCameras() {
+      const res = await fetch('/api/cameras/sync', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        loadCameras();
+      }
+    }
+    async function toggleCamera(id, enabled) {
+      const camera = cameras.find(c => c.id === id);
+      if (!camera) return;
+      camera.enabled = enabled;
+      await fetch(`/api/cameras/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(camera)
+      });
+      loadCameras();
+    }
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Add Camera';
+      document.getElementById('cameraId').value = '';
+      document.getElementById('cameraForm').reset();
+      document.getElementById('cameraModal').classList.add('show');
+    }
+    function editCamera(id) {
+      const camera = cameras.find(c => c.id === id);
+      if (!camera) return;
+      document.getElementById('modalTitle').textContent = 'Edit Camera';
+      document.getElementById('cameraId').value = camera.id;
+      document.getElementById('cameraName').value = camera.name;
+      document.getElementById('cameraType').value = camera.cameraType;
+      document.getElementById('detectPerson').checked = camera.detectionConfigs.find(d => d.detectionType === 'person')?.enabled || false;
+      document.getElementById('detectVehicle').checked = camera.detectionConfigs.find(d => d.detectionType === 'vehicle')?.enabled || false;
+      document.getElementById('detectLicensePlate').checked = camera.detectionConfigs.find(d => d.detectionType === 'license_plate')?.enabled || false;
+      document.getElementById('preAlarm').value = camera.videoConfig.preAlarmSeconds;
+      document.getElementById('postAlarm').value = camera.videoConfig.postAlarmSeconds;
+      document.getElementById('cameraModal').classList.add('show');
+    }
+    function closeModal() {
+      document.getElementById('cameraModal').classList.remove('show');
+    }
+    document.getElementById('cameraForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('cameraId').value;
+      const existing = cameras.find(c => c.id === id);
+      const camera = {
+        id: id || `cam-${Date.now()}`,
+        name: document.getElementById('cameraName').value,
+        enabled: existing ? existing.enabled : true,
+        cameraType: document.getElementById('cameraType').value,
+        hardwareId: id || '',
+        detectionConfigs: [
+          { detectionType: 'person', enabled: document.getElementById('detectPerson').checked },
+          { detectionType: 'vehicle', enabled: document.getElementById('detectVehicle').checked },
+          { detectionType: 'license_plate', enabled: document.getElementById('detectLicensePlate').checked }
+        ],
+        videoConfig: {
+          preAlarmSeconds: parseInt(document.getElementById('preAlarm').value),
+          postAlarmSeconds: parseInt(document.getElementById('postAlarm').value)
+        }
+      };
+      await fetch(`/api/cameras/${id || camera.id}`, {
+        method: id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(camera)
+      });
+      closeModal();
+      loadCameras();
+    });
+    async function deleteCamera(id) {
+      if (!confirm('Delete this camera?')) return;
+      await fetch(`/api/cameras/${id}`, { method: 'DELETE' });
+      loadCameras();
+    }
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login';
+    }
+    loadCameras();
+  </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal-worker
+  namespace: video-ai
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: temporal-worker
+  template:
+    metadata:
+      labels:
+        app: temporal-worker
+    spec:
+      containers:
+        - name: temporal-worker
+          image: video-ai/temporal-worker:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KAFKA_BROKERS
+              value: "kafka:9092"
+            - name: KAFKA_TOPIC
+              value: "video-ai-processing"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: NORMAL_MODEL_PATH
+              value: "/models/yolov7-normal.onnx"
+            - name: THERMAL_MODEL_PATH
+              value: "/models/yolov7-thermal.onnx"
+            - name: OCR_ENDPOINT
+              value: "http://license-plate:8004/ocr"
+            - name: VMS_BRIDGE_URL
+              value: "http://vms-bridge:8001"
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "2"
+              nvidia.com/gpu: 1
+            limits:
+              memory: "2Gi"
+              cpu: "4"
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: model-storage
+              mountPath: /models
+              readOnly: true
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/healthy
+            initialDelaySeconds: 60
+            periodSeconds: 30
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: model-storage-pvc
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: temporal-worker
+  namespace: video-ai
+spec:
+  selector:
+    app: temporal-worker
+  ports:
+    - port: 7233
+      targetPort: 7233
+  type: ClusterIP

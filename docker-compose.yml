@@ -1,0 +1,196 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-video_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  primary-api:
+    image: video-ai/primary-api:latest
+    container_name: primary-api
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-video_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      MINIO_HOST: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-video-ai}
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_TOPIC_PREFIX: ${KAFKA_TOPIC_PREFIX:-video-ai}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  vms-bridge:
+    image: video-ai/vms-bridge:latest
+    container_name: vms-bridge
+    ports:
+      - "8001:8001"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-video_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      MILESTONE_HOST: ${MILESTONE_HOST:-192.168.1.100}
+      MILESTONE_PORT: ${MILESTONE_PORT:-443}
+      MILESTONE_USERNAME: ${MILESTONE_USERNAME:-admin}
+      MILESTONE_PASSWORD: ${MILESTONE_PASSWORD:-password}
+      AI_BRIDGE_HOST: ${AI_BRIDGE_HOST:-localhost}
+      AI_BRIDGE_PORT: ${AI_BRIDGE_PORT:-4000}
+      PRIMARY_API_URL: http://primary-api:8000
+      SYNC_CAMERAS_ON_STARTUP: "true"
+      DEFAULT_PRE_ALARM_SECONDS: ${DEFAULT_PRE_ALARM_SECONDS:-5}
+      DEFAULT_POST_ALARM_SECONDS: ${DEFAULT_POST_ALARM_SECONDS:-5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  temporal:
+    image: video-ai/temporal:latest
+    container_name: temporal
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-video_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID:-temporal-worker}
+      KAFKA_TOPIC: ${KAFKA_TOPIC:-video-ai-processing}
+      NORMAL_MODEL_PATH: /models/yolov7-normal.onnx
+      THERMAL_MODEL_PATH: /models/yolov7-thermal.onnx
+      OCR_ENDPOINT: http://license-plate:8004/ocr
+      VMS_BRIDGE_URL: http://vms-bridge:8001
+    volumes:
+      - ./models:/models:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7233/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  license-plate:
+    image: video-ai/license-plate:latest
+    container_name: license-plate
+    ports:
+      - "8004:8004"
+    environment:
+      OCR_MODEL_PATH: /models/ocr-plate.onnx
+    volumes:
+      - ./models:/models:ro
+
+  web-app:
+    image: video-ai/web-app:latest
+    container_name: web-app
+    ports:
+      - "8005:8005"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-video_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      VMS_BRIDGE_URL: http://vms-bridge:8001
+      PRIMARY_API_URL: http://primary-api:8000
+      SESSION_SECRET: ${SESSION_SECRET:-change-this-secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres-data:
+  minio-data:
+
+networks:
+  default:
+    name: video-ai-net

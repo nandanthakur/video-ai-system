@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vms-bridge
+  namespace: video-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vms-bridge
+  template:
+    metadata:
+      labels:
+        app: vms-bridge
+    spec:
+      containers:
+        - name: vms-bridge
+          image: video-ai/vms-bridge:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8001
+          env:
+            - name: VMS_BRIDGE_PORT
+              value: "8001"
+            - name: AI_BRIDGE_GRAPHQL_ENDPOINT
+              value: "http://milestone-aib:4000/api/bridge/graphql"
+            - name: PRIMARY_API_URL
+              value: "http://primary-api:8000"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: SYNC_CAMERAS_ON_STARTUP
+              value: "true"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vms-bridge
+  namespace: video-ai
+spec:
+  selector:
+    app: vms-bridge
+  ports:
+    - port: 8001
+      targetPort: 8001
+  type: ClusterIP

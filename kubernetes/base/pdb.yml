@@ -1,0 +1,32 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: primary-api-pdb
+  namespace: video-ai
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: primary-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: temporal-worker-pdb
+  namespace: video-ai
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: temporal-worker
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-app-pdb
+  namespace: video-ai
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: web-app

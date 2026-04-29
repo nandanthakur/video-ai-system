@@ -1,0 +1,49 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: video-ai
+
+resources:
+  - ../../base
+
+patches:
+  # Primary API - dev: 1 replica, no HPA
+  - patch: |-
+      - op: remove
+        path: /spec/replicas
+    target:
+      kind: Deployment
+      name: primary-api
+
+  - patch: |-
+      - op: remove
+        path: /metadata/name
+        value: primary-api-hpa
+    target:
+      kind: HorizontalPodAutoscaler
+      name: primary-api-hpa
+
+  # Temporal Worker - dev: 1 replica, no HPA
+  - patch: |-
+      - op: remove
+        path: /spec/replicas
+    target:
+      kind: Deployment
+      name: temporal-worker
+
+  - patch: |-
+      - op: remove
+        path: /metadata/name
+        value: temporal-worker-hpa
+    target:
+      kind: HorizontalPodAutoscaler
+      name: temporal-worker-hpa
+
+  # Web App - dev: 1 replica
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: web-app

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: video-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: web-app
+          image: video-ai/web-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8005
+          env:
+            - name: WEB_APP_PORT
+              value: "8005"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: VMS_BRIDGE_URL
+              value: "http://vms-bridge:8001"
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: video-ai-secrets
+                  key: session-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app
+  namespace: video-ai
+spec:
+  selector:
+    app: web-app
+  ports:
+    - port: 8005
+      targetPort: 8005
+  type: ClusterIP
